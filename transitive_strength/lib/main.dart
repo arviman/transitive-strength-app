@@ -10,31 +10,31 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Crypto Pairs App',
+      title: 'Transitive Pairs App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: CryptoPairsPage(),
+      home: PairsPage(),
     );
   }
 }
 
-class CryptoPairsPage extends StatefulWidget {
+class PairsPage extends StatefulWidget {
   @override
-  _CryptoPairsPageState createState() => _CryptoPairsPageState();
+  _PairsPageState createState() => _PairsPageState();
 }
 
-class _CryptoPairsPageState extends State<CryptoPairsPage> {
-  List<Map<String, String>> cryptoPairs = [];
+class _PairsPageState extends State<PairsPage> {
+  List<Map<String, String>> pairs = [];
   final _formKey = GlobalKey<FormState>();
-  String fromCrypto = '';
-  String toCrypto = '';
+  String from = '';
+  String to = '';
 
   void _addPair() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       setState(() {
-        cryptoPairs.add({'from': fromCrypto, 'to': toCrypto});
+        pairs.add({'from': from, 'to': to});
       });
     }
   }
@@ -44,7 +44,7 @@ class _CryptoPairsPageState extends State<CryptoPairsPage> {
     final response = await http.post(
       Uri.parse(url),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'pairs': cryptoPairs}),
+      body: jsonEncode({'pairs': pairs}),
     );
 
     if (response.statusCode == 200) {
@@ -52,7 +52,7 @@ class _CryptoPairsPageState extends State<CryptoPairsPage> {
         SnackBar(content: Text('Pairs submitted successfully!')),
       );
       setState(() {
-        cryptoPairs.clear();
+        pairs.clear();
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -85,7 +85,7 @@ class _CryptoPairsPageState extends State<CryptoPairsPage> {
                         return null;
                       },
                       onSaved: (value) {
-                        fromCrypto = value!;
+                        from = value!;
                       },
                     ),
                   ),
@@ -100,7 +100,7 @@ class _CryptoPairsPageState extends State<CryptoPairsPage> {
                         return null;
                       },
                       onSaved: (value) {
-                        toCrypto = value!;
+                        to = value!;
                       },
                     ),
                   ),
@@ -113,16 +113,16 @@ class _CryptoPairsPageState extends State<CryptoPairsPage> {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: cryptoPairs.length,
+                itemCount: pairs.length,
                 itemBuilder: (context, index) {
-                  final pair = cryptoPairs[index];
+                  final pair = pairs[index];
                   return ListTile(
                     title: Text('${pair['from']} -> ${pair['to']}'),
                     trailing: IconButton(
                       icon: Icon(Icons.delete),
                       onPressed: () {
                         setState(() {
-                          cryptoPairs.removeAt(index);
+                          pairs.removeAt(index);
                         });
                       },
                     ),
